@@ -1,0 +1,38 @@
+# Die Rechte des Agenten. Diese Datei ist die eigentliche Sicherheitsmassnahme
+# und entspricht Folie 13. Wer sie aendert, aendert die Vorfuehrung.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agent
+  namespace: demo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: agent-readonly
+rules:
+  - apiGroups: ["", "apps", "batch"]
+    resources: ["pods", "events", "deployments", "replicasets", "jobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  # Bewusst NICHT enthalten:
+  #   verbs  patch, update, create, delete   -> erzeugt die Ablehnung in Schritt 3
+  #   pods/exec                              -> schliesst den Weg von Prompt Injection zur Ausfuehrung
+  #   secrets, configmaps                    -> der Agent soll Konfigurationsfehler finden,
+  #                                             keine Zugangsdaten lesen
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agent-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: agent-readonly
+subjects:
+  - kind: ServiceAccount
+    name: agent
+    namespace: demo

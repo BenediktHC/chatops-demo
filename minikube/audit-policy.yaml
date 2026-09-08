@@ -1,0 +1,24 @@
+# Optionale Audit-Regeln. Nur aktiv, wenn setup.sh mit AUDIT=1 laeuft.
+#
+# Zweck in der Vorfuehrung: in der Fragerunde zeigen, dass jeder einzelne
+# Werkzeugaufruf des Agenten im Audit-Log des API-Servers steht, mit dem
+# Dienstkonto als Urheber:
+#
+#   minikube -p chatops-demo ssh -- \
+#     "sudo grep serviceaccount:demo:agent /var/log/kubernetes/audit.log | tail -5"
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:
+  - RequestReceived
+rules:
+  # Alles, was das Dienstkonto des Agenten tut, mit Metadaten protokollieren.
+  - level: Metadata
+    users: ["system:serviceaccount:demo:agent"]
+
+  # Aenderungen an der Anwendung vollstaendig protokollieren.
+  - level: RequestResponse
+    namespaces: ["demo"]
+    verbs: ["create", "update", "patch", "delete"]
+
+  # Rauschen unterdruecken.
+  - level: None

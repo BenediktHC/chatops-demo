@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: checkout
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BenediktHC/chatops-demo.git
+    targetRevision: HEAD
+    path: manifests
+    directory:
+      # Nur die Anwendung wird synchronisiert, NICHT 10-agent-rbac.yaml.
+      # Der Agent kann seine eigenen Rechte damit auch ueber den Git-Weg
+      # nicht erweitern. Guter Satz fuer die Fragerunde.
+      include: "20-checkout.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo
+  syncPolicy:
+    automated:
+      prune: true
+      # selfHeal MUSS aus bleiben.
+      # Mit selfHeal=true wuerde Argo CD den Fehler aus "break.sh local"
+      # innerhalb von Sekunden zurueckdrehen und die Vorfuehrung zerstoeren.
+      # Ausgeschaltet zeigt Argo CD die Abweichung stattdessen als OutOfSync an.
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
