@@ -10,7 +10,7 @@ say() { printf '\n\033[36m==> %s\033[0m\n' "$1"; }
 
 say "Argo CD installieren"
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-kubectl apply -n argocd -f \
+kubectl apply --server-side=true --force-conflicts -n argocd -f \
   https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml >/dev/null
 
 say "Auf HTTP umstellen (sonst meckert der Browser auf der Buehne)"

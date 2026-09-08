@@ -22,7 +22,7 @@ echo
 
 case "$AGENT" in
   holmes)
-    holmes ask "$FRAGE"
+    holmes ask "$FRAGE" < /dev/null
     ;;
   kubectl-ai)
     kubectl-ai "$FRAGE"

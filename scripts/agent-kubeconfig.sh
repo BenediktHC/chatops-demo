@@ -11,7 +11,7 @@ DURATION="${TOKEN_DURATION:-8h}"
 
 SERVER="$(kubectl config view --minify --context "$KONTEXT" \
   -o jsonpath='{.clusters[0].cluster.server}')"
-CA="$(kubectl config view --raw --minify --context "$KONTEXT" \
+CA="$(kubectl config view --raw --flatten --minify --context "$KONTEXT" \
   -o jsonpath='{.clusters[0].cluster.certificate-authority-data}')"
 TOKEN="$(kubectl -n demo create token agent --duration="$DURATION")"
 

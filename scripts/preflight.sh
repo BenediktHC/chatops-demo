@@ -45,7 +45,7 @@ unset KUBECONFIG
 echo
 echo "Git und Argo CD"
 pruefe "Git-Remote gesetzt"  git -C "$ROOT" remote get-url origin
-pruefe "Arbeitsbaum sauber"  bash -c "[ -z \"$(git -C '$ROOT' status --porcelain)\" ]"
+pruefe "Arbeitsbaum sauber"  test -z "$(git -C "$ROOT" status --porcelain)"
 pruefe "Push moeglich"       git -C "$ROOT" push --dry-run
 pruefe "Argo CD laeuft"      kubectl -n argocd get deploy argocd-server
 pruefe "Anwendung Synced"    bash -c \
